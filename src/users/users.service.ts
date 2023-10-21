@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AccountService } from 'src/account/account.service';
 import { DbService } from 'src/db/db.service';
 
 @Injectable()
@@ -7,7 +8,7 @@ export class UsersService {
    * Подключаем DB через DI
    * @param db
    */
-  constructor(private db: DbService) {}
+  constructor(private db: DbService, private accountService: AccountService) {}
 
   /**
    * Метод для логина и регистрации
@@ -27,7 +28,8 @@ export class UsersService {
    */
   async create(email: string, hash: string, salt: string) {
     const user = await this.db.user.create({ data: { email, hash, salt } });
-
-    return user;
+    await this.accountService.create(user.id);
+    
+    return user
   }
 }
